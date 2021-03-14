@@ -50,10 +50,10 @@
         th.topic {
             width: 200pt;
         }
-        th.retained {
+        th.retained, th.qos {
             width: 0;
         }
-        td.retained {
+        td.retained, td.qos {
             text-align: center;
         }
         td.unsub {
@@ -121,6 +121,12 @@
         .edit-publish {
             margin-right: 10px;
         }
+        td.qos input, #publish-qos {
+            width: 30pt;
+        }
+        label[for="publish-qos"] {
+            margin-left: 20px;
+        }
     </style>
 </head>
 <body>
@@ -143,19 +149,20 @@
         <table class="form" style="margin-bottom:15px"><tr><td style="width:0"><label for="publish-topic">Topic:</label></td><td><input id="publish-topic" style="width:100%"></td></tr>
         <tr><td><label for="publish-payload">Payload:</label></td><td><textarea id="publish-payload" style="width:100%;height:50pt"></textarea></td></tr></table>
         <div><input id="publish-retained" type="checkbox"><label for="publish-retained">Retained</label>
+        <label for="publish-qos">QoS:</label><input id="publish-qos" type="number" min="0" max="2" value="0">
         <button id="publish">Publish</button></div>
     </details>
 </div>
 <div>
     <details open><summary>Most Recent Payloads</summary>
         <div><button id="clear-recent">Clear</button></div>
-        <table id="recent-payloads"><thead><tr><th class="topic">Topic</th><th class="payload">Payload</th><th class="retained">Retained?</th></thead><tbody></tbody></table>
+        <table id="recent-payloads"><thead><tr><th class="topic">Topic</th><th class="payload">Payload</th><th class="qos">QoS</th><th class="retained">Retained?</th></thead><tbody></tbody></table>
     </details>
 </div>
 <div>
     <details open><summary><input id="history-enable" type="checkbox"><label for="history-enable">Message History</label></summary>
         <div><button id="clear-history">Clear</button></div>
-        <table id="history"><thead><tr><th class="time">Time</th><th class="topic">Topic</th><th class="payload">Payload</th></thead><tbody></tbody></table>
+        <table id="history"><thead><tr><th class="time">Time</th><th class="topic">Topic</th><th class="payload">Payload</th><th class="qos">QoS</th><th class="retained">Retained?</th></thead><tbody></tbody></table>
     </details>
 </div>
 </body>

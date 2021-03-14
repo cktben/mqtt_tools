@@ -40,7 +40,8 @@ function stopEditing(row) {
 function publishEdited(topic, row) {
     var payload = row.find('.edit-payload')[0].value;
     var retained = row.find('.retained input')[0].checked;
-    client.send(topic, payload, 0, retained);
+    var qos = parseInt(row.find('.qos input')[0].value);
+    client.send(topic, payload, qos, retained);
     stopEditing(row);
 }
 
@@ -54,10 +55,12 @@ function messageArrived(msg) {
         var tdPayload = $('<td class="payload"><div class="display"><span class="content"></span><span class="start-edit button">&#x270e;</span></div>' +
             '<div class="editor"><span title="Cancel" class="edit-cancel button">&#x274c;</span><span title="Publish" class="edit-publish button">&#x2b95;</span>' +
             '<div class="edit-payload-container"><input class="edit-payload"></div></td>');
+        var tdQoS = $('<td class="qos"><div class="display"><span></span></div><div class="editor"><input type="number" min="0" max="2"></div></td>');
         var tdRetained = $('<td class="retained"><input type="checkbox" disabled="true"></td>');
         tdName.text(topic);
         row.append(tdName);
         row.append(tdPayload);
+        row.append(tdQoS);
         row.append(tdRetained);
         row.find('.edit-cancel').click(function() { stopEditing(row); });
         row.find('.edit-publish').click(function() { publishEdited(topic, row); });
@@ -67,6 +70,8 @@ function messageArrived(msg) {
     }
     row.find('.payload .content').text(payload);
     row.find('.retained input')[0].checked = msg.retained;
+    row.find('.qos input')[0].value = msg.qos;
+    row.find('.qos .display span').text(msg.qos);
 
     flash(row);
 
@@ -75,12 +80,20 @@ function messageArrived(msg) {
         var tdTime = $('<td class="time"></td>');
         var tdTopic = $('<td class="topic"></td>');
         var tdPayload = $('<td class="payload"></td>');
+        var tdQoS = $('<td class="qos"></td>');
+        var tdRetained = $('<td class="retained"></td>');
         tdTime.text(new Date().toISOString());
         tdTopic.text(topic);
         tdPayload.text(payload);
+        tdQoS.text(msg.qos);
+        if (msg.retained) {
+            tdRetained.html("&#x2713;");
+        }
         trHistory.append(tdTime);
         trHistory.append(tdTopic);
         trHistory.append(tdPayload);
+        trHistory.append(tdQoS);
+        trHistory.append(tdRetained);
         $('#history tbody').append(trHistory);
     }
 }
