@@ -1,4 +1,4 @@
-var client = new Paho.Client('localhost', 1881, '', '');
+var client = null;
 var recentPayloadRows = {};
 var subscriptionRows = {};
 
@@ -14,11 +14,6 @@ function disconnected(response) {
     $('#disconnect').prop('disabled', true);
     $('#subscribe').prop('disabled', true);
     $('#publish').prop('disabled', true);
-
-    var status = $('#connection-status');
-    status.removeClass('connected');
-    status.removeClass('connection-failed');
-    status.text('Disconnected');
 
     subscriptionRows = {};
     $('#subscriptions tbody tr').remove();
@@ -39,15 +34,13 @@ function stopEditing(row) {
 
 function publishEdited(topic, row) {
     var payload = row.find('.edit-payload')[0].value;
-    var retained = row.find('.retained input')[0].checked;
+    var retain = row.find('.retained input')[0].checked;
     var qos = parseInt(row.find('.qos input')[0].value);
-    client.send(topic, payload, qos, retained);
+    client.publish(topic, payload, {qos: qos, retain: retain});
     stopEditing(row);
 }
 
-function messageArrived(msg) {
-    var topic = msg.destinationName;
-    var payload = msg.payloadString;
+function messageReceived(topic, payload, msg) {
     var row = recentPayloadRows[topic];
     if (!row) {
         row = $('<tr class="topic"></tr>');
@@ -69,7 +62,7 @@ function messageArrived(msg) {
         recentPayloadRows[topic] = row;
     }
     row.find('.payload .content').text(payload);
-    row.find('.retained input')[0].checked = msg.retained;
+    row.find('.retained input')[0].checked = msg.retain;
     row.find('.qos input')[0].value = msg.qos;
     row.find('.qos .display span').text(msg.qos);
 
@@ -99,46 +92,66 @@ function messageArrived(msg) {
 }
 
 $(document).ready(function() {
-    client.onConnectionLost = disconnected;
-    client.onMessageArrived = messageArrived;
-
     disconnected();
 
     $('#connect').click(function() {
         $('#connect').prop('disabled', true);
 
-        try {
-            client.disconnect();
-        } catch (error) {
-            // The client may not have been connected.
+        var host = $('#connect-host')[0].value;
+        var port = parseInt($('#connect-port')[0].value);
+
+        if (client) {
+            client.end();
         }
 
+        client = mqtt.connect({
+            host: host,
+            port: port,
+            protocol: 'ws',
+            username: $('#connect-username')[0].value,
+            password: $('#connect-password')[0].value
+        });
+
         var status = $('#connection-status');
-        client.connect({
-            hosts: [$('#connect-host')[0].value],
-            ports: [parseInt($('#connect-port')[0].value)],
-            userName: $('#connect-username')[0].value,
-            password: $('#connect-password')[0].value,
-            onSuccess: function() {
-                status.addClass('connected');
-                status.removeClass('connection-failed');
-                status.text('Connected');
-                $('#connect').prop('disabled', false);
-                $('#disconnect').prop('disabled', false);
-                $('#subscribe').prop('disabled', false);
-                $('#publish').prop('disabled', false);
-            }, onFailure: function(response) {
-                $('#connect').prop('disabled', false);
-                console.log(response);
-                status.removeClass('connected');
-                status.addClass('connection-failed');
-                status.text('Connection failed: ' + response.errorMessage);
-            }});
+        client.on('connect', function() {
+            status.addClass('connected');
+            status.removeClass('connection-failed');
+            status.text('Connected');
+            $('#connect').prop('disabled', false);
+            $('#disconnect').prop('disabled', false);
+            $('#subscribe').prop('disabled', false);
+            $('#publish').prop('disabled', false);
+        });
+
+        client.on('error', function(error) {
+            $('#connect').prop('disabled', false);
+            status.removeClass('connected');
+            status.addClass('connection-failed');
+            status.text('' + error);
+
+            // Don't keep trying to reconnect.
+            client.end();
+            client = null;
+        });
+
+        client.on('close', function() {
+            disconnected();
+        });
+
+        client.on('message', messageReceived);
     });
 
     $('#disconnect').click(function() {
+        var status = $('#connection-status');
+        status.removeClass('connected');
+        status.removeClass('connection-failed');
+        status.text('Disconnected');
+
         try {
-            client.disconnect();
+            if (client) {
+                client.end();
+                client = null;
+            }
         } catch (error) {
             status.addClass('connection-failed');
             status.text('Disconnection failed: ' + response.errorMessage);
@@ -182,7 +195,8 @@ $(document).ready(function() {
     $('#publish').click(function() {
         var topic = $('#publish-topic')[0].value;
         var payload = $('#publish-payload')[0].value;
-        var retained = $('#publish-retained')[0].checked;
-        client.send(topic, payload, 0, retained);
+        var retain = $('#publish-retained')[0].checked;
+        var qos = parseInt($("#publish-qos")[0].value);
+        client.publish(topic, payload, {qos:qos, retain: retain});
     });
 });
