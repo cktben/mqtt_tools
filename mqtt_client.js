@@ -1,4 +1,4 @@
-var client = new Paho.MQTT.Client('localhost', 1881, '', '');
+var client = new Paho.Client('localhost', 1881, '', '');
 var recentPayloadRows = {};
 var subscriptionRows = {};
 
