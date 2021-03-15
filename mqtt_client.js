@@ -40,6 +40,20 @@ function publishEdited(topic, row) {
     stopEditing(row);
 }
 
+function formatNumber(value, digits) {
+    return value.toString().padStart(digits, '0');
+}
+
+function currentTimeString() {
+    var time = new Date();
+    return time.getFullYear().toString() + '-' +
+        formatNumber(time.getMonth() + 1, 2) + '-' +
+        formatNumber(time.getDate(), 2) + ' ' +
+        formatNumber(time.getHours(), 2) + ':' +
+        formatNumber(time.getMinutes(), 2) + ':' +
+        formatNumber(time.getSeconds(), 2);
+}
+
 function messageReceived(topic, payload, msg) {
     var row = recentPayloadRows[topic];
     if (!row) {
@@ -75,7 +89,7 @@ function messageReceived(topic, payload, msg) {
         var tdPayload = $('<td class="payload"></td>');
         var tdQoS = $('<td class="qos"></td>');
         var tdRetained = $('<td class="retained"></td>');
-        tdTime.text(new Date().toISOString());
+        tdTime.text(currentTimeString());
         tdTopic.text(topic);
         tdPayload.text(payload);
         tdQoS.text(msg.qos);
