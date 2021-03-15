@@ -121,11 +121,14 @@
         .edit-publish {
             margin-right: 10px;
         }
-        td.qos input, #publish-qos {
+        input.qos {
             width: 30pt;
         }
         label[for="publish-qos"] {
             margin-left: 20px;
+        }
+        #subscribe-topic {
+            margin-right: 15px;
         }
     </style>
 </head>
@@ -143,13 +146,13 @@
     </details>
     <details class="details-inline" open><summary>Subscriptions</summary>
         <table id="subscriptions"><thead><tr><th class="topic">Topic</th><td class="unsub"></td></tr></thead><tbody></tbody></table>
-        <div style="margin-top:15px"><label for="subscribe-topic">Topic:</label><input id="subscribe-topic"><button id="subscribe">Subscribe</button></div>
+        <div style="margin-top:15px"><label for="subscribe-topic">Topic:</label><input id="subscribe-topic"><label for="subscribe-qos">QoS:</label><input class="qos" id="subscribe-qos" type="number" min="0" max="2" value="0"><button id="subscribe">Subscribe</button></div>
     </details>
     <details id="details-publish" class="details-inline" open><summary>Publish</summary>
         <table class="form" style="margin-bottom:15px"><tr><td style="width:0"><label for="publish-topic">Topic:</label></td><td><input id="publish-topic" style="width:100%"></td></tr>
         <tr><td><label for="publish-payload">Payload:</label></td><td><textarea id="publish-payload" style="width:100%;height:50pt"></textarea></td></tr></table>
         <div><input id="publish-retained" type="checkbox"><label for="publish-retained">Retained</label>
-        <label for="publish-qos">QoS:</label><input id="publish-qos" type="number" min="0" max="2" value="0">
+        <label for="publish-qos">QoS:</label><input class="qos" id="publish-qos" type="number" min="0" max="2" value="0">
         <button id="publish">Publish</button></div>
     </details>
 </div>

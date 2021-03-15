@@ -48,7 +48,7 @@ function messageReceived(topic, payload, msg) {
         var tdPayload = $('<td class="payload"><div class="display"><span class="content"></span><span class="start-edit button">&#x270e;</span></div>' +
             '<div class="editor"><span title="Cancel" class="edit-cancel button">&#x274c;</span><span title="Publish" class="edit-publish button">&#x2b95;</span>' +
             '<div class="edit-payload-container"><input class="edit-payload"></div></td>');
-        var tdQoS = $('<td class="qos"><div class="display"><span></span></div><div class="editor"><input type="number" min="0" max="2"></div></td>');
+        var tdQoS = $('<td class="qos"><div class="display"><span></span></div><div class="editor"><input class="qos" type="number" min="0" max="2"></div></td>');
         var tdRetained = $('<td class="retained"><input type="checkbox" disabled="true"></td>');
         tdName.text(topic);
         row.append(tdName);
@@ -180,7 +180,8 @@ $(document).ready(function() {
         subscriptionRows[topic] = tr;
         $('#subscriptions tbody').append(tr);
 
-        client.subscribe(topic);
+        var qos = parseInt($("#subscribe-qos")[0].value);
+        client.subscribe(topic, {qos: qos});
     });
 
     $('#clear-recent').click(function() {
@@ -197,6 +198,6 @@ $(document).ready(function() {
         var payload = $('#publish-payload')[0].value;
         var retain = $('#publish-retained')[0].checked;
         var qos = parseInt($("#publish-qos")[0].value);
-        client.publish(topic, payload, {qos:qos, retain: retain});
+        client.publish(topic, payload, {qos: qos, retain: retain});
     });
 });
