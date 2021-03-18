@@ -150,7 +150,7 @@ function messageReceived(topic, payload, msg) {
         tdPayload.find('.history-payload').text(payload);
         tdPayload.find('.history-publish').click(function() { republishHistory(msg); });
         tdQoS.text(msg.qos);
-        if (msg.retained) {
+        if (msg.retain) {
             tdRetained.html("&#x2713;");
         }
         trHistory.append(tdTime);
