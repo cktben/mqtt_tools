@@ -115,8 +115,8 @@ function messageReceived(topic, payload, msg) {
     if (!row) {
         row = $('<tr class="topic"></tr>');
         var tdName = $('<td class="topic"></td>')
-        var tdPayload = $('<td class="payload"><div class="display"><span class="content"></span><span class="start-edit button">&#x270e;</span></div>' +
-            '<div class="editor"><span title="Cancel" class="edit-cancel button">&#x274c;</span><span title="Publish" class="edit-publish button">&#x2b95;</span>' +
+        var tdPayload = $('<td class="payload"><div class="display"><span class="content"></span><span class="start-edit button button-border">&#x270e;</span></div>' +
+            '<div class="editor"><span title="Cancel" class="edit-cancel button button-border">&#x274c;</span><span title="Publish" class="edit-publish button button-border">&#x2b95;</span>' +
             '<div class="edit-payload-container"><input class="edit-payload"></div></td>');
         var tdQoS = $('<td class="qos"><div class="display"><span></span></div><div class="editor"><input class="qos" type="number" min="0" max="2"></div></td>');
         var tdRetained = $('<td class="retained"><input type="checkbox" disabled="true"></td>');
@@ -142,7 +142,7 @@ function messageReceived(topic, payload, msg) {
         var trHistory = $('<tr></tr>');
         var tdTime = $('<td class="time"></td>');
         var tdTopic = $('<td class="topic"></td>');
-        var tdPayload = $('<td class="payload"><span class="history-payload"></span><span title="Republish" class="history-publish button">&#x2b95;</span></td>');
+        var tdPayload = $('<td class="payload"><span class="history-payload"></span><span title="Republish" class="history-publish button button-border">&#x2b95;</span></td>');
         var tdQoS = $('<td class="qos"></td>');
         var tdRetained = $('<td class="retained"></td>');
         tdTime.text(currentTimeString());
