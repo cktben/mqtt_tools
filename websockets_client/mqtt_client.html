@@ -133,6 +133,18 @@
         #subscribe-topic {
             margin-right: 15px;
         }
+        .history-publish {
+            float: right;
+        }
+        table.alternating tr:nth-child(even) {
+            background-color: #e8e8e8;
+        }
+        table tbody tr.editing {
+            background-color: #cdf;
+        }
+        #history tr:hover {
+            background-color: #cdf;
+        }
     </style>
 </head>
 <body>
@@ -163,13 +175,13 @@
 <div>
     <details open><summary>Most Recent Payloads</summary>
         <div><button id="clear-recent">Clear</button></div>
-        <table id="recent-payloads"><thead><tr><th class="topic">Topic</th><th class="payload">Payload</th><th class="qos">QoS</th><th class="retained">Retained?</th></thead><tbody></tbody></table>
+        <table id="recent-payloads" class="alternating"><thead><tr><th class="topic">Topic</th><th class="payload">Payload</th><th class="qos">QoS</th><th class="retained">Retained?</th></thead><tbody></tbody></table>
     </details>
 </div>
 <div>
     <details open><summary><input id="history-enable" type="checkbox"><label for="history-enable">Message History</label></summary>
         <div><button id="clear-history">Clear</button></div>
-        <table id="history"><thead><tr><th class="time">Time</th><th class="topic">Topic</th><th class="payload">Payload</th><th class="qos">QoS</th><th class="retained">Retained?</th></thead><tbody></tbody></table>
+        <table id="history" class="alternating"><thead><tr><th class="time">Time</th><th class="topic">Topic</th><th class="payload">Payload</th><th class="qos">QoS</th><th class="retained">Retained?</th></thead><tbody></tbody></table>
     </details>
 </div>
 </body>

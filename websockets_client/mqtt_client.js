@@ -74,12 +74,14 @@ function startEditing(topic, row) {
     row.find('.editor').show();
     row.find('.retained input').prop('disabled', false);
     row.find('.edit-payload')[0].value = row.find('.content').text();
+    row.addClass('editing');
 }
 
 function stopEditing(row) {
     row.find('.display').show();
     row.find('.editor').hide();
     row.find('.retained input').prop('disabled', true);
+    row.removeClass('editing');
 }
 
 function publishEdited(topic, row) {
@@ -102,6 +104,10 @@ function currentTimeString() {
         formatNumber(time.getHours(), 2) + ':' +
         formatNumber(time.getMinutes(), 2) + ':' +
         formatNumber(time.getSeconds(), 2);
+}
+
+function republishHistory(msg) {
+    client.publish(msg.topic, msg.payload, {qos: msg.qos, retain: msg.retain});
 }
 
 function messageReceived(topic, payload, msg) {
@@ -136,12 +142,13 @@ function messageReceived(topic, payload, msg) {
         var trHistory = $('<tr></tr>');
         var tdTime = $('<td class="time"></td>');
         var tdTopic = $('<td class="topic"></td>');
-        var tdPayload = $('<td class="payload"></td>');
+        var tdPayload = $('<td class="payload"><span class="history-payload"></span><span title="Republish" class="history-publish button">&#x2b95;</span></td>');
         var tdQoS = $('<td class="qos"></td>');
         var tdRetained = $('<td class="retained"></td>');
         tdTime.text(currentTimeString());
         tdTopic.text(topic);
-        tdPayload.text(payload);
+        tdPayload.find('.history-payload').text(payload);
+        tdPayload.find('.history-publish').click(function() { republishHistory(msg); });
         tdQoS.text(msg.qos);
         if (msg.retained) {
             tdRetained.html("&#x2713;");
