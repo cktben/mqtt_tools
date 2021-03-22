@@ -19,10 +19,10 @@ with open(args.mqtt_config, 'r') as f:
     mqtt_config = json.load(f)
 
 client = mqtt.Client()
-client.username_pw_set(mqtt_config['username'], mqtt_config['password'])
+client.username_pw_set(mqtt_config.get('username'), mqtt_config.get('password'))
 if mqtt_config.get('use_tls', False):
     client.tls_set(mqtt_config.get('ca_certs'))
-client.connect(mqtt_config['host'], mqtt_config['port'])
+client.connect(mqtt_config['host'], mqtt_config.get('port', 1883))
 client.loop_start()
 
 if args.load:
