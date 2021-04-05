@@ -4,7 +4,7 @@ import json
 import paho.mqtt.client as mqtt
 
 def is_primitive(value):
-    return isinstance(value, int) or isinstance(value, float) or isinstance(value, str)
+    return type(value) in (int, float, str, bool)
 
 def message_fields(payload):
     payload = payload.decode()
@@ -18,7 +18,7 @@ def message_fields(payload):
         for key, value in obj.items():
             if is_primitive(value):
                 fields[key] = value
-            else:
+            elif value is not None:
                 return {'value': payload}
         return fields
     elif is_primitive(obj):
@@ -61,13 +61,14 @@ class MQTT_InfluxDB_Logger:
             return
 
         fields = message_fields(msg.payload)
-        points = [{
-            'measurement': msg.topic,
-            'fields': fields
-        }]
-        if self.verbose:
-            print(points)
-        self._influxdb.write_points(points)
+        if fields:
+            points = [{
+                'measurement': msg.topic,
+                'fields': fields
+            }]
+            if self.verbose:
+                print(points)
+            self._influxdb.write_points(points)
 
     def run(self):
         self._mqtt.loop_forever()
