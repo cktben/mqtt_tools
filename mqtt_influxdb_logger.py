@@ -41,7 +41,7 @@ class MQTT_InfluxDB_Logger:
             self._mqtt.username_pw_set(username, self._mqtt_config.get('password'))
         if self._mqtt_config.get('use_tls', False):
             self._mqtt.tls_set(self._mqtt_config.get('ca_certs'), self._mqtt_config.get('certfile'), self._mqtt_config.get('keyfile'))
-        self._mqtt.connect(self._mqtt_config['host'], self._mqtt_config.get('port', 1883))
+        self._mqtt.connect(self._mqtt_config.get('host', 'localhost'), self._mqtt_config.get('port', 1883))
 
         for topic in self._config.get('topics', []):
             self._mqtt.subscribe(topic)
@@ -75,16 +75,22 @@ class MQTT_InfluxDB_Logger:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Logs MQTT messages to an InfluxDB database.')
     parser.add_argument('-c', '--config', help='Configuration file', default='logger.json')
-    parser.add_argument('-m', '--mqtt-config', help='MQTT configuration file', default='mqtt.json')
-    parser.add_argument('-i', '--influxdb-config', help='InfluxDB configuration file', default='influxdb.json')
+    parser.add_argument('-m', '--mqtt-config', help='MQTT configuration file')
+    parser.add_argument('-i', '--influxdb-config', help='InfluxDB configuration file')
     parser.add_argument('-v', help='Verbose', action='store_true', dest='verbose')
     args = parser.parse_args()
 
-    with open(args.mqtt_config, 'r') as f:
-        mqtt_config = json.load(f)
+    if args.mqtt_config:
+        with open(args.mqtt_config, 'r') as f:
+            mqtt_config = json.load(f)
+    else:
+        mqtt_config = {}
 
-    with open(args.influxdb_config, 'r') as f:
-        influxdb_config = json.load(f)
+    if args.influxdb_config:
+        with open(args.influxdb_config, 'r') as f:
+            influxdb_config = json.load(f)
+    else:
+        influxdb_config = {}
 
     with open(args.config, 'r') as f:
         config = json.load(f)
