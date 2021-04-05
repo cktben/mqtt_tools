@@ -7,7 +7,7 @@ import threading
 import paho.mqtt.client as mqtt
 
 class MQTTShell(cmd.Cmd):
-    def __init__(self, client):
+    def __init__(self, client, username, host):
         super().__init__()
 
         self._client = client
@@ -19,7 +19,11 @@ class MQTTShell(cmd.Cmd):
         # a command being typed less readable.
         self._in_prompt = False
 
-        self.prompt = 'MQTT: %s@%s> ' % (self._client._username.decode(), self._client._host)
+        self.prompt = 'MQTT: '
+        if username:
+            self.prompt += username + '@'
+
+        self.prompt += '%s> ' % host
 
     def emptyline(self):
         pass
@@ -79,21 +83,27 @@ class MQTTShell(cmd.Cmd):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('config', help='Configuration file')
     parser.add_argument('-s', dest='sub', help='Subscribe to this topic', nargs='+', default=[])
+    parser.add_argument('-m', '--mqtt-config', help='MQTT configuration file')
     args = parser.parse_args()
 
-    with open(args.config, 'r') as config_file:
-        config = json.load(config_file)
+    if args.mqtt_config:
+        with open(args.mqtt_config, 'r') as config_file:
+            config = json.load(config_file)
+    else:
+        config = {}
 
     mqtt_client = mqtt.Client()
-    mqtt_client.username_pw_set(config.get('username'), config.get('password'))
+    username = config.get('username')
+    if username:
+        mqtt_client.username_pw_set(username, config.get('password'))
     if config.get('use_tls', False):
         mqtt_client.tls_set(config.get('ca_certs'), config.get('certfile'), config.get('keyfile'))
-    mqtt_client.connect(config['host'], config.get('port', 1883))
+    host = config.get('host', 'localhost')
+    mqtt_client.connect(host, config.get('port', 1883))
     mqtt_client.loop_start()
 
     for sub in args.sub:
         mqtt_client.subscribe(sub)
 
-    MQTTShell(mqtt_client).cmdloop()
+    MQTTShell(mqtt_client, username, host).cmdloop()
