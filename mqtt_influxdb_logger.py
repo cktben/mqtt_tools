@@ -1,5 +1,6 @@
 import argparse
 from influxdb import InfluxDBClient
+from influxdb.exceptions import InfluxDBClientError
 import json
 import paho.mqtt.client as mqtt
 
@@ -8,6 +9,7 @@ def is_primitive(value):
 
 def message_fields(payload):
     payload = payload.decode()
+
     try:
         obj = json.loads(payload)
     except:
@@ -32,6 +34,7 @@ class MQTT_InfluxDB_Logger:
         self._config = config
         self._mqtt_config = mqtt_config
         self._influxdb_config = influxdb_config
+        self.error_topic = config.get('error_topic')
 
     def connect_mqtt(self):
         self._mqtt = mqtt.Client()
@@ -68,7 +71,12 @@ class MQTT_InfluxDB_Logger:
             }]
             if self.verbose:
                 print(points)
-            self._influxdb.write_points(points)
+            try:
+                self._influxdb.write_points(points)
+            except InfluxDBClientError as ex:
+                print(ex)
+                if self.error_topic and msg.topic != self.error_topic:
+                    self._mqtt.publish(self.error_topic, ex.content)
 
     def run(self):
         self._mqtt.loop_forever()
