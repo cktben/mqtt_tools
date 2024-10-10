@@ -37,8 +37,11 @@ class MQTT_InfluxDB_Logger:
         self.error_topic = config.get('error_topic')
 
     def connect_mqtt(self):
-        self._mqtt = mqtt.Client()
+        self._mqtt = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         self._mqtt.on_message = self._on_message
+        self._mqtt.on_connect = self._on_connect
+        if self.verbose:
+            self._mqtt.on_log = self._on_log
         username = self._mqtt_config.get('username')
         if username:
             self._mqtt.username_pw_set(username, self._mqtt_config.get('password'))
@@ -46,8 +49,12 @@ class MQTT_InfluxDB_Logger:
             self._mqtt.tls_set(self._mqtt_config.get('ca_certs'), self._mqtt_config.get('certfile'), self._mqtt_config.get('keyfile'))
         self._mqtt.connect(self._mqtt_config.get('host', 'localhost'), self._mqtt_config.get('port', 1883))
 
+    def _on_connect(self, client, userdata, connect_flags, reason_code, properties):
         for topic in self._config.get('topics', []):
             self._mqtt.subscribe(topic)
+
+    def _on_log(self, client, userdata, level, buf):
+        print('MQTT:', level, buf)
 
     def connect_influxdb(self):
         self._influxdb = InfluxDBClient(
