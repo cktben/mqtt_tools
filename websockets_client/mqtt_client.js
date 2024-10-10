@@ -172,10 +172,12 @@ $(document).ready(function() {
             client.end();
         }
 
-        client = mqtt.connect({
-            host: $('#connect-host')[0].value,
-            port: parseInt($('#connect-port')[0].value),
-            protocol: $('#connect-tls')[0].checked ? 'wss' : 'ws',
+        const host = $('#connect-host')[0].value;
+        const port = parseInt($('#connect-port')[0].value);
+        const protocol = $('#connect-tls')[0].checked ? 'wss' : 'ws';
+        const url = `${protocol}://${host}:${port}`
+        console.log('Connecting to', url);
+        client = mqtt.connect(url, {
             username: $('#connect-username')[0].value,
             password: $('#connect-password')[0].value
         });
