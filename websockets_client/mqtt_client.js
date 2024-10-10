@@ -1,18 +1,18 @@
-var client = null;
-var recentPayloadRows = {};
-var subscriptionRows = {};
+let client = null;
+let recentPayloadRows = {};
+let subscriptionRows = {};
 
-var Disconnected = 0;
-var Connecting = 1;
-var Connected = 2;
-var connectionState = -1;
-var connectionError = null;
+const Disconnected = 0;
+const Connecting = 1;
+const Connected = 2;
+let connectionState = -1;
+let connectionError = null;
 
 function changeConnectionState(state) {
     if (connectionState != state) {
         connectionState = state;
 
-        var status = $('#connection-status');
+        const status = $('#connection-status');
 
         switch (connectionState) {
             case Disconnected:
@@ -85,9 +85,9 @@ function stopEditing(row) {
 }
 
 function publishEdited(topic, row) {
-    var payload = row.find('.edit-payload')[0].value;
-    var retain = row.find('.retained input')[0].checked;
-    var qos = parseInt(row.find('.qos input')[0].value);
+    const payload = row.find('.edit-payload')[0].value;
+    const retain = row.find('.retained input')[0].checked;
+    const qos = parseInt(row.find('.qos input')[0].value);
     client.publish(topic, payload, {qos: qos, retain: retain});
     stopEditing(row);
 }
@@ -97,7 +97,7 @@ function formatNumber(value, digits) {
 }
 
 function currentTimeString() {
-    var time = new Date();
+    const time = new Date();
     return time.getFullYear().toString() + '-' +
         formatNumber(time.getMonth() + 1, 2) + '-' +
         formatNumber(time.getDate(), 2) + ' ' +
@@ -111,15 +111,15 @@ function republishHistory(msg) {
 }
 
 function messageReceived(topic, payload, msg) {
-    var row = recentPayloadRows[topic];
+    let row = recentPayloadRows[topic];
     if (!row) {
         row = $('<tr class="topic"></tr>');
-        var tdName = $('<td class="topic"></td>')
-        var tdPayload = $('<td class="payload"><div class="display"><span class="content"></span><span class="start-edit button button-border">&#x270e;</span></div>' +
+        const tdName = $('<td class="topic"></td>')
+        const tdPayload = $('<td class="payload"><div class="display"><span class="content"></span><span class="start-edit button button-border">&#x270e;</span></div>' +
             '<div class="editor"><span title="Cancel" class="edit-cancel button button-border">&#x274c;</span><span title="Publish" class="edit-publish button button-border">&#x2b95;</span>' +
             '<div class="edit-payload-container"><input class="edit-payload"></div></td>');
-        var tdQoS = $('<td class="qos"><div class="display"><span></span></div><div class="editor"><input class="qos" type="number" min="0" max="2"></div></td>');
-        var tdRetained = $('<td class="retained"><input type="checkbox" disabled="true"></td>');
+        const tdQoS = $('<td class="qos"><div class="display"><span></span></div><div class="editor"><input class="qos" type="number" min="0" max="2"></div></td>');
+        const tdRetained = $('<td class="retained"><input type="checkbox" disabled="true"></td>');
         tdName.text(topic);
         row.append(tdName);
         row.append(tdPayload);
@@ -139,12 +139,12 @@ function messageReceived(topic, payload, msg) {
     flash(row);
 
     if ($('#history-enable')[0].checked) {
-        var trHistory = $('<tr></tr>');
-        var tdTime = $('<td class="time"></td>');
-        var tdTopic = $('<td class="topic"></td>');
-        var tdPayload = $('<td class="payload"><span class="history-payload"></span><span title="Republish" class="history-publish button button-border">&#x2b95;</span></td>');
-        var tdQoS = $('<td class="qos"></td>');
-        var tdRetained = $('<td class="retained"></td>');
+        const trHistory = $('<tr></tr>');
+        const tdTime = $('<td class="time"></td>');
+        const tdTopic = $('<td class="topic"></td>');
+        const tdPayload = $('<td class="payload"><span class="history-payload"></span><span title="Republish" class="history-publish button button-border">&#x2b95;</span></td>');
+        const tdQoS = $('<td class="qos"></td>');
+        const tdRetained = $('<td class="retained"></td>');
         tdTime.text(currentTimeString());
         tdTopic.text(topic);
         tdPayload.find('.history-payload').text(payload);
@@ -218,16 +218,16 @@ $(document).ready(function() {
     });
 
     $('#subscribe').click(function() {
-        var topic = $('#subscribe-topic')[0].value;
+        const topic = $('#subscribe-topic')[0].value;
         if (subscriptionRows[topic]) {
             // Prevent duplicate subscriptions.
             return;
         }
 
         // Add a row with an unsubscribe button to the subscriptions table.
-        var tr = $('<tr></tr>');
-        var tdUnsub = $('<td class="unsub button">&#x274c;</td>');
-        var tdTopic = $('<td class="topic"></td>');
+        const tr = $('<tr></tr>');
+        const tdUnsub = $('<td class="unsub button">&#x274c;</td>');
+        const tdTopic = $('<td class="topic"></td>');
         tdTopic.text(topic);
         tr.append(tdTopic);
         tr.append(tdUnsub);
@@ -239,7 +239,7 @@ $(document).ready(function() {
         subscriptionRows[topic] = tr;
         $('#subscriptions tbody').append(tr);
 
-        var qos = parseInt($("#subscribe-qos")[0].value);
+        const qos = parseInt($("#subscribe-qos")[0].value);
         client.subscribe(topic, {qos: qos});
     });
 
@@ -253,10 +253,10 @@ $(document).ready(function() {
     });
 
     $('#publish').click(function() {
-        var topic = $('#publish-topic')[0].value;
-        var payload = $('#publish-payload')[0].value;
-        var retain = $('#publish-retained')[0].checked;
-        var qos = parseInt($("#publish-qos")[0].value);
+        const topic = $('#publish-topic')[0].value;
+        const payload = $('#publish-payload')[0].value;
+        const retain = $('#publish-retained')[0].checked;
+        const qos = parseInt($("#publish-qos")[0].value);
         client.publish(topic, payload, {qos: qos, retain: retain});
     });
 });
