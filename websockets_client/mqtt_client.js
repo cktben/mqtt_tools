@@ -166,6 +166,7 @@ $(document).ready(function() {
     changeConnectionState(Disconnected);
 
     $('#connect').click(function() {
+        connectionError = null;
         $('#connect').prop('disabled', true);
 
         if (client) {
@@ -185,20 +186,29 @@ $(document).ready(function() {
         changeConnectionState(Connecting);
 
         client.on('connect', function() {
+            console.log('Connected');
             changeConnectionState(Connected);
         });
 
         client.on('error', function(error) {
-            connectionError = error.toString();
+            console.log('Error:', error.message);
+            connectionError = error.message;
             changeConnectionState(Disconnected);
 
             // Don't keep trying to reconnect.
-            client.end();
-            client = null;
+            if (client) {
+                client.end();
+                client = null;
+            }
+        });
+
+        client.on('reconnect', function() {
+            console.log('Reconnecting');
+            changeConnectionState(Connecting);
         });
 
         client.on('close', function() {
-            changeConnectionState(Disconnected);
+            console.log('Connection closed');
         });
 
         client.on('message', messageReceived);
