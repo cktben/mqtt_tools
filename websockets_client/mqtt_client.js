@@ -32,6 +32,11 @@ function changeConnectionState(state) {
                 $('#disconnect').prop('disabled', true);
                 $('#subscribe').prop('disabled', true);
                 $('#publish').prop('disabled', true);
+                $('#connect-host').prop('disabled', false);
+                $('#connect-port').prop('disabled', false);
+                $('#connect-username').prop('disabled', false);
+                $('#connect-password').prop('disabled', false);
+                $('#connect-tls').prop('disabled', false);
 
                 subscriptionRows = {};
                 $('#subscriptions tbody tr').remove();
@@ -46,6 +51,11 @@ function changeConnectionState(state) {
                 $('#disconnect').prop('disabled', false);
                 $('#subscribe').prop('disabled', true);
                 $('#publish').prop('disabled', true);
+                $('#connect-host').prop('disabled', true);
+                $('#connect-port').prop('disabled', true);
+                $('#connect-username').prop('disabled', true);
+                $('#connect-password').prop('disabled', true);
+                $('#connect-tls').prop('disabled', true);
                 break;
 
             case Connected:
@@ -57,6 +67,11 @@ function changeConnectionState(state) {
                 $('#disconnect').prop('disabled', false);
                 $('#subscribe').prop('disabled', false);
                 $('#publish').prop('disabled', false);
+                $('#connect-host').prop('disabled', true);
+                $('#connect-port').prop('disabled', true);
+                $('#connect-username').prop('disabled', true);
+                $('#connect-password').prop('disabled', true);
+                $('#connect-tls').prop('disabled', true);
                 break;
         }
     }
